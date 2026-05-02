@@ -12,14 +12,6 @@
         <p style="color:var(--text-muted);line-height:1.8;">Сделать образование доступным, интересным и эффективным для каждого — от школьника до студента. Мы используем принципы геймификации: очки опыта, уровни, достижения и соревнования — всё это делает процесс обучения по-настоящему захватывающим.</p>
         <h3 style="font-weight:800;color:var(--primary);margin:2rem 0 1rem">Что есть на платформе?</h3>
         <div class="row g-3">
-          {% for icon, text in '🎮,Обучающие игры и квизы по всем предметам|📚,Структурированные курсы с уроками|🏆,Система достижений и наград|📊,Личный прогресс и статистика|🥇,Таблица лидеров' | split:'|' %}
-          <div class="col-md-6">
-            <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;background:rgba(255,255,255,0.03);border-radius:10px">
-              <span style="font-size:1.5rem">{{ icon }}</span>
-              <span style="font-weight:600;color:var(--text-muted)">{{ text }}</span>
-            </div>
-          </div>
-          {% endfor %}
           <div class="col-md-6">
             <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;background:rgba(255,255,255,0.03);border-radius:10px">
               <span style="font-size:1.5rem">🎮</span>
@@ -40,17 +32,17 @@
           </div>
           <div class="col-md-6">
             <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;background:rgba(255,255,255,0.03);border-radius:10px">
+              <span style="font-size:1.5rem">📊</span>
+              <span style="font-weight:600;color:var(--text-muted)">Личный прогресс и статистика</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div style="display:flex;align-items:center;gap:.75rem;padding:.75rem;background:rgba(255,255,255,0.03);border-radius:10px">
               <span style="font-size:1.5rem">🥇</span>
-              <span style="font-weight:600;color:var(--text-muted)">Таблица лидеров и соревнования</span>
+              <span style="font-weight:600;color:var(--text-muted)">Таблица лидеров</span>
             </div>
           </div>
         </div>
-        <div class="text-center mt-4">
-          <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-5">
-            <i class="bi bi-rocket me-2"></i>Присоединиться бесплатно
-          </a>
-        </div>
-      </div>
     </div>
   </div>
 </div>
