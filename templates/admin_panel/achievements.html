@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Достижения — Админ{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-3">
+      <div class="card-game p-3">
+        <div style="font-family:'Orbitron',sans-serif;font-weight:700;font-size:.9rem;color:var(--primary);margin-bottom:1rem;padding:.5rem 1rem">⚙️ АДМИН-ПАНЕЛЬ</div>
+        <nav class="d-flex flex-column gap-1">
+          <a href="{% url 'admin_panel:dashboard' %}" style="color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:10px;font-weight:600"><i class="bi bi-speedometer2"></i> Дашборд</a>
+          <a href="{% url 'admin_panel:users' %}" style="color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:10px;font-weight:600"><i class="bi bi-people"></i> Пользователи</a>
+          <a href="{% url 'admin_panel:games' %}" style="color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:10px;font-weight:600"><i class="bi bi-controller"></i> Игры</a>
+          <a href="{% url 'admin_panel:courses' %}" style="color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:10px;font-weight:600"><i class="bi bi-book"></i> Курсы</a>
+          <a href="{% url 'admin_panel:achievements' %}" style="color:var(--primary);background:rgba(108,99,255,0.15);text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:10px;font-weight:600"><i class="bi bi-trophy"></i> Достижения</a>
+          <hr style="border-color:rgba(108,99,255,0.3)">
+          <a href="{% url 'core:home' %}" style="color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:10px;font-weight:600"><i class="bi bi-house"></i> На сайт</a>
+        </nav>
+      </div>
+    </div>
+    <div class="col-lg-9">
+      <h2 style="font-family:'Orbitron',sans-serif;font-weight:700;margin-bottom:1.5rem">🏆 Достижения</h2>
+      <div class="row g-3">
+        {% for ach in achievements %}
+        <div class="col-md-6">
+          <div class="card-game p-3 d-flex align-items-center gap-3">
+            <div style="font-size:2rem;min-width:48px;text-align:center">{{ ach.icon }}</div>
+            <div class="flex-grow-1">
+              <div style="font-weight:800">{{ ach.title }}</div>
+              <div style="color:var(--text-muted);font-size:.85rem">{{ ach.description }}</div>
+              <div style="color:var(--text-muted);font-size:.75rem;margin-top:.25rem">
+                Условие: {{ ach.condition_type }} ≥ {{ ach.condition_value }}
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="color:var(--accent);font-weight:700">+{{ ach.xp_reward }} XP</div>
+              <div style="color:var(--text-muted);font-size:.75rem">{{ ach.get_category_display }}</div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

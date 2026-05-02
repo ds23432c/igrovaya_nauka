@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Рейтинг — Игровая Наука{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="section-title mb-2">🥇 Таблица лидеров</h1>
+  <p style="color:var(--text-muted)" class="mb-4">Соревнуйся с лучшими учениками платформы!</p>
+
+  {% if user.is_authenticated and my_rank %}
+  <div class="card-game p-3 mb-4 d-flex align-items-center gap-3">
+    <div style="font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:900;color:var(--primary);min-width:60px;text-align:center">#{{ my_rank }}</div>
+    <img src="{{ user.avatar }}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--primary)">
+    <div>
+      <div style="font-weight:800">{{ user.username }} <span style="color:var(--text-muted);font-size:.8rem">(Вы)</span></div>
+      <div style="color:var(--accent);font-weight:700">{{ user.xp }} XP · {{ user.get_level_title }}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="card-game overflow-hidden">
+    {% for player in top_users %}
+    <div class="d-flex align-items-center gap-3 p-3 {% if user.is_authenticated and player.pk == user.pk %}{% endif %}"
+         style="border-bottom:1px solid var(--card-border);{% if user.is_authenticated and player.pk == user.pk %}background:rgba(108,99,255,0.1){% endif %}">
+
+      <div style="width:48px;text-align:center;font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.1rem;
+        color:{% if forloop.counter == 1 %}#FFD700{% elif forloop.counter == 2 %}#C0C0C0{% elif forloop.counter == 3 %}#CD7F32{% else %}var(--text-muted){% endif %}">
+        {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% elif forloop.counter == 3 %}🥉{% else %}#{{ forloop.counter }}{% endif %}
+      </div>
+
+      <img src="{{ player.avatar }}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;
+        border:2px solid {% if forloop.counter == 1 %}#FFD700{% elif forloop.counter == 2 %}#C0C0C0{% elif forloop.counter == 3 %}#CD7F32{% else %}var(--card-border){% endif %}">
+
+      <div class="flex-grow-1">
+        <div style="font-weight:800">
+          <a href="{% url 'accounts:public_profile' player.username %}" style="color:var(--text);text-decoration:none">
+            {{ player.username }}
+          </a>
+          {% if user.is_authenticated and player.pk == user.pk %}
+          <span style="background:rgba(108,99,255,0.2);color:var(--primary);border-radius:6px;padding:1px 6px;font-size:.7rem;font-weight:700;margin-left:.5rem">Вы</span>
+          {% endif %}
+        </div>
+        <div style="color:var(--text-muted);font-size:.8rem">{{ player.get_level_title }} · Ур. {{ player.level }}</div>
+      </div>
+
+      <div class="text-end">
+        <div style="font-family:'Orbitron',sans-serif;font-weight:900;color:var(--accent)">{{ player.xp }}</div>
+        <div style="color:var(--text-muted);font-size:.75rem">XP</div>
+      </div>
+
+      <div class="text-end d-none d-md-block" style="min-width:80px">
+        <div style="font-weight:700">{{ player.total_games_played }}</div>
+        <div style="color:var(--text-muted);font-size:.75rem">игр</div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-5" style="color:var(--text-muted)">
+      <div style="font-size:3rem">🏆</div>
+      <p>Ещё никто не зарегистрировался. Будь первым!</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block title %}{{ game.title }} — Играем!{% endblock %}
+{% block extra_css %}
+<style>
+.quiz-container { max-width: 750px; margin: 0 auto; }
+.question-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 2.5rem; }
+.option-btn {
+  background: rgba(255,255,255,0.04);
+  border: 2px solid var(--card-border);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: all .2s;
+  color: var(--text);
+  text-align: left;
+  width: 100%;
+  font-size: 1rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: .75rem;
+}
+.option-btn:hover:not(:disabled) { border-color: var(--primary); background: rgba(108,99,255,0.1); transform: translateX(4px); }
+.option-btn.correct { border-color: var(--accent) !important; background: rgba(67,233,123,0.15) !important; color: var(--accent) !important; }
+.option-btn.wrong { border-color: var(--secondary) !important; background: rgba(255,101,132,0.15) !important; color: var(--secondary) !important; }
+.option-btn:disabled { cursor: default; }
+.option-label { width: 32px; height: 32px; border-radius: 8px; background: rgba(108,99,255,0.2); display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; }
+.progress-bar-game { background: rgba(255,255,255,0.1); border-radius: 10px; height: 6px; overflow: hidden; margin-bottom: 2rem; }
+.progress-fill { background: linear-gradient(90deg, var(--primary), var(--accent)); height: 100%; border-radius: 10px; transition: width .4s ease; }
+.timer { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 900; }
+.result-card { text-align: center; padding: 3rem; }
+.result-score { font-family: 'Orbitron', sans-serif; font-size: 4rem; font-weight: 900; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="quiz-container">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <a href="{% url 'games:detail' game.pk %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Выйти
+      </a>
+      <h5 style="font-family:'Orbitron',sans-serif;font-weight:700;margin:0;color:var(--primary)">{{ game.title }}</h5>
+      <div class="timer" id="timer">00:00</div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-bar-game">
+      <div class="progress-fill" id="progress" style="width:0%"></div>
+    </div>
+
+    <div id="quiz-question" class="question-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span style="color:var(--text-muted);font-size:.9rem" id="q-counter">Вопрос 1 из ?</span>
+        <span style="color:var(--accent);font-weight:700" id="score-display">Счёт: 0</span>
+      </div>
+      <h3 style="font-weight:800;margin-bottom:1.5rem;line-height:1.4" id="question-text">Загрузка...</h3>
+      <div id="options"></div>
+      <div id="explanation" style="display:none;margin-top:1rem;padding:1rem;border-radius:12px;background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.3)">
+        <strong style="color:var(--primary)">💡 Объяснение:</strong>
+        <p style="margin:0.5rem 0 0;color:var(--text-muted)" id="explanation-text"></p>
+      </div>
+      <div class="mt-4 text-end" id="next-btn-container" style="display:none!important">
+        <button class="btn btn-primary px-4" onclick="nextQuestion()">
+          Следующий <i class="bi bi-arrow-right ms-1"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Result (hidden initially) -->
+    <div id="quiz-result" class="question-card result-card" style="display:none">
+      <div id="result-emoji" style="font-size:4rem;margin-bottom:1rem">🏆</div>
+      <div class="result-score" id="result-score" style="color:var(--accent)">0%</div>
+      <p style="color:var(--text-muted);margin:1rem 0">Правильных ответов: <strong id="result-correct">0</strong> из <strong id="result-total">0</strong></p>
+      <p style="color:var(--primary);font-size:1.1rem;font-weight:700" id="result-xp">+0 XP</p>
+      <div id="new-achievements" class="mt-3"></div>
+      <div class="d-flex gap-3 justify-content-center mt-4">
+        <button class="btn btn-primary px-4" onclick="location.reload()"><i class="bi bi-arrow-clockwise me-1"></i>Ещё раз</button>
+        <a href="{% url 'games:list' %}" class="btn btn-outline-primary px-4">Все игры</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const questions = {{ questions_json|safe }};
+const gameId = {{ game.pk }};
+const xpReward = {{ game.xp_reward }};
+let current = 0, score = 0, correct = 0, startTime = Date.now(), timerInterval;
+
+const labels = ['A', 'B', 'C', 'D'];
+const keys = ['option_a', 'option_b', 'option_c', 'option_d'];
+
+function formatTime(ms) {
+  const s = Math.floor(ms/1000), m = Math.floor(s/60);
+  return `${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+
+timerInterval = setInterval(() => {
+  document.getElementById('timer').textContent = formatTime(Date.now() - startTime);
+}, 1000);
+
+function showQuestion() {
+  const q = questions[current];
+  document.getElementById('q-counter').textContent = `Вопрос ${current+1} из ${questions.length}`;
+  document.getElementById('progress').style.width = `${((current)/questions.length)*100}%`;
+  document.getElementById('question-text').textContent = q.text;
+  document.getElementById('explanation').style.display = 'none';
+  document.getElementById('next-btn-container').style.display = 'none';
+
+  const optDiv = document.getElementById('options');
+  optDiv.innerHTML = '';
+  keys.forEach((key, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-label">${labels[i]}</span> ${q[key]}`;
+    btn.onclick = () => selectAnswer(labels[i].toLowerCase(), btn);
+    optDiv.appendChild(btn);
+  });
+}
+
+function selectAnswer(chosen, btn) {
+  const q = questions[current];
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+
+  if (chosen === q.correct) {
+    btn.classList.add('correct');
+    correct++;
+    score += 10;
+    document.getElementById('score-display').textContent = `Счёт: ${score}`;
+  } else {
+    btn.classList.add('wrong');
+    const correctIdx = ['a','b','c','d'].indexOf(q.correct);
+    btns[correctIdx].classList.add('correct');
+  }
+
+  if (q.explanation) {
+    document.getElementById('explanation-text').textContent = q.explanation;
+    document.getElementById('explanation').style.display = 'block';
+  }
+  document.getElementById('next-btn-container').style.display = 'block';
+}
+
+function nextQuestion() {
+  current++;
+  if (current < questions.length) {
+    showQuestion();
+  } else {
+    finishGame();
+  }
+}
+
+async function finishGame() {
+  clearInterval(timerInterval);
+  const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+  const pct = Math.round((correct / questions.length) * 100);
+  const xp = Math.round((correct / questions.length) * xpReward);
+
+  document.getElementById('quiz-question').style.display = 'none';
+  const res = document.getElementById('quiz-result');
+  res.style.display = 'block';
+  document.getElementById('result-score').textContent = pct + '%';
+  document.getElementById('result-correct').textContent = correct;
+  document.getElementById('result-total').textContent = questions.length;
+  document.getElementById('result-xp').textContent = `+${xp} XP`;
+  document.getElementById('result-emoji').textContent = pct >= 80 ? '🏆' : pct >= 60 ? '⭐' : pct >= 40 ? '💪' : '📚';
+  document.getElementById('progress').style.width = '100%';
+
+  try {
+    const resp = await fetch(`/games/${gameId}/submit/`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','X-CSRFToken': getCookie('csrftoken')},
+      body: JSON.stringify({correct, total: questions.length, time_spent: timeSpent})
+    });
+    const data = await resp.json();
+    if (data.new_achievements && data.new_achievements.length > 0) {
+      const div = document.getElementById('new-achievements');
+      div.innerHTML = '<p style="color:var(--accent);font-weight:700">🏅 Новые достижения!</p>' +
+        data.new_achievements.map(a => `<span style="background:rgba(108,99,255,0.2);border:1px solid rgba(108,99,255,0.4);border-radius:12px;padding:.5rem 1rem;margin:.25rem;display:inline-block;font-weight:700">${a.icon} ${a.title}</span>`).join('');
+    }
+  } catch(e) { console.log(e); }
+}
+
+function getCookie(name) {
+  let v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+  return v ? v[2] : null;
+}
+
+showQuestion();
+</script>
+{% endblock %}

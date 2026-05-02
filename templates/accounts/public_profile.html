@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.username }} — Игровая Наука{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <div class="card-game p-4 p-md-5 text-center">
+        <img src="{{ profile_user.avatar }}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);margin-bottom:1rem">
+        <h2 style="font-weight:800">{{ profile_user.username }}</h2>
+        <p style="color:var(--primary);font-weight:700">{{ profile_user.get_level_title }} · Уровень {{ profile_user.level }}</p>
+        {% if profile_user.bio %}<p style="color:var(--text-muted)">{{ profile_user.bio }}</p>{% endif %}
+        <div class="row g-3 mt-2">
+          <div class="col-4"><div class="stat-card"><div class="stat-number">{{ profile_user.xp }}</div><div class="text-muted small">XP</div></div></div>
+          <div class="col-4"><div class="stat-card"><div class="stat-number">{{ profile_user.total_games_played }}</div><div class="text-muted small">Игр</div></div></div>
+          <div class="col-4"><div class="stat-card"><div class="stat-number">{{ user_achievements.count }}</div><div class="text-muted small">Наград</div></div></div>
+        </div>
+        {% if user_achievements %}
+        <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
+          {% for ua in user_achievements %}
+          <span style="font-size:1.5rem" title="{{ ua.achievement.title }}">{{ ua.achievement.icon }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

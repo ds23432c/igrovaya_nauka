@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Игры — Админ{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-3">
+      <div class="card-game p-3">
+        <div style="font-family:'Orbitron',sans-serif;font-weight:700;font-size:.9rem;color:var(--primary);margin-bottom:1rem;padding:.5rem 1rem">⚙️ АДМИН-ПАНЕЛЬ</div>
+        <nav class="d-flex flex-column gap-1">
+          <a href="{% url 'admin_panel:dashboard' %}" style="color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:10px;font-weight:600"><i class="bi bi-speedometer2"></i> Дашборд</a>
+          <a href="{% url 'admin_panel:users' %}" style="color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:10px;font-weight:600"><i class="bi bi-people"></i> Пользователи</a>
+          <a href="{% url 'admin_panel:games' %}" style="color:var(--primary);background:rgba(108,99,255,0.15);text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:10px;font-weight:600"><i class="bi bi-controller"></i> Игры</a>
+          <a href="{% url 'admin_panel:courses' %}" style="color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:10px;font-weight:600"><i class="bi bi-book"></i> Курсы</a>
+          <a href="{% url 'admin_panel:achievements' %}" style="color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:10px;font-weight:600"><i class="bi bi-trophy"></i> Достижения</a>
+          <hr style="border-color:rgba(108,99,255,0.3)">
+          <a href="{% url 'core:home' %}" style="color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:10px;font-weight:600"><i class="bi bi-house"></i> На сайт</a>
+        </nav>
+      </div>
+    </div>
+    <div class="col-lg-9">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 style="font-family:'Orbitron',sans-serif;font-weight:700">🎮 Игры</h2>
+        <a href="{% url 'admin_panel:game_new' %}" class="btn btn-primary"><i class="bi bi-plus me-1"></i>Добавить игру</a>
+      </div>
+      <div class="card-game overflow-hidden">
+        <div class="table-responsive">
+          <table class="table mb-0" style="color:var(--text)">
+            <thead style="background:rgba(255,255,255,0.03);font-size:.8rem;text-transform:uppercase;color:var(--text-muted)">
+              <tr>
+                <th class="p-3">Игра</th>
+                <th class="p-3">Категория</th>
+                <th class="p-3">Сложность</th>
+                <th class="p-3">Сыграно</th>
+                <th class="p-3">XP</th>
+                <th class="p-3">Статус</th>
+                <th class="p-3">Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for game in games %}
+              <tr style="border-top:1px solid var(--card-border)">
+                <td class="p-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <img src="{{ game.cover_url }}" style="width:40px;height:40px;border-radius:8px;object-fit:cover">
+                    <span style="font-weight:700;font-size:.9rem">{{ game.title|truncatechars:30 }}</span>
+                  </div>
+                </td>
+                <td class="p-3"><span class="badge-category">{{ game.get_category_display }}</span></td>
+                <td class="p-3"><span class="badge-diff-{{ game.difficulty }}">{{ game.get_difficulty_display }}</span></td>
+                <td class="p-3" style="color:var(--text-muted)">{{ game.plays_count }}</td>
+                <td class="p-3" style="color:var(--accent);font-weight:700">{{ game.xp_reward }}</td>
+                <td class="p-3">
+                  {% if game.is_active %}
+                  <span style="color:var(--accent);font-size:.8rem;font-weight:700">● Активна</span>
+                  {% else %}
+                  <span style="color:var(--secondary);font-size:.8rem;font-weight:700">● Скрыта</span>
+                  {% endif %}
+                </td>
+                <td class="p-3">
+                  <a href="{% url 'admin_panel:game_edit' game.pk %}" class="btn btn-sm btn-outline-primary">Изменить</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

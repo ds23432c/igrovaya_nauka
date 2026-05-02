@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Профиль — {{ user.username }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row g-4">
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <div class="card-game p-4 text-center mb-4">
+        <img src="{{ user.avatar }}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);margin-bottom:1rem">
+        <h3 style="font-weight:800;margin-bottom:.25rem">{{ user.username }}</h3>
+        <p style="color:var(--primary);font-weight:700;margin-bottom:.5rem">{{ user.get_level_title }}</p>
+        {% if user.bio %}
+        <p style="color:var(--text-muted);font-size:.9rem">{{ user.bio }}</p>
+        {% endif %}
+        <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:1rem;margin-top:1rem">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span style="color:var(--text-muted);font-size:.85rem">Уровень {{ user.level }}</span>
+            <span style="color:var(--accent);font-size:.85rem;font-weight:700">{{ user.xp }} XP</span>
+          </div>
+          <div class="xp-bar"><div class="xp-fill" style="width:{{ user.xp_progress_percent }}%"></div></div>
+          <small style="color:var(--text-muted)">До уровня {{ user.level|add:1 }}: {{ user.xp_for_next_level }} XP</small>
+        </div>
+        <a href="{% url 'accounts:edit_profile' %}" class="btn btn-outline-primary w-100 mt-3">
+          <i class="bi bi-pencil me-1"></i>Редактировать профиль
+        </a>
+      </div>
+
+      <div class="card-game p-4">
+        <h6 style="font-weight:800;margin-bottom:1rem;color:var(--text-muted);font-size:.8rem;text-transform:uppercase">Статистика</h6>
+        <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--card-border)">
+          <span style="color:var(--text-muted)">🎮 Игр сыграно</span>
+          <strong>{{ user.total_games_played }}</strong>
+        </div>
+        <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--card-border)">
+          <span style="color:var(--text-muted)">📚 Курсов пройдено</span>
+          <strong>{{ user.total_courses_completed }}</strong>
+        </div>
+        <div class="d-flex justify-content-between py-2" style="border-bottom:1px solid var(--card-border)">
+          <span style="color:var(--text-muted)">🏆 Достижений</span>
+          <strong>{{ user_achievements.count }}</strong>
+        </div>
+        <div class="d-flex justify-content-between py-2">
+          <span style="color:var(--text-muted)">⭐ Всего XP</span>
+          <strong style="color:var(--accent)">{{ user.xp }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="col-lg-8">
+      <!-- Achievements -->
+      {% if user_achievements %}
+      <div class="card-game p-4 mb-4">
+        <h5 style="font-weight:800;margin-bottom:1rem">🏅 Достижения</h5>
+        <div class="d-flex flex-wrap gap-2">
+          {% for ua in user_achievements %}
+          <div style="background:rgba(108,99,255,0.15);border:1px solid rgba(108,99,255,0.3);border-radius:12px;padding:.5rem 1rem;text-align:center"
+               title="{{ ua.achievement.description }}">
+            <div style="font-size:1.5rem">{{ ua.achievement.icon }}</div>
+            <div style="font-size:.7rem;font-weight:700;color:var(--primary)">{{ ua.achievement.title }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Recent games -->
+      <div class="card-game p-4 mb-4">
+        <h5 style="font-weight:800;margin-bottom:1rem">🎮 Последние игры</h5>
+        {% for result in game_results %}
+        <div class="d-flex align-items-center justify-content-between py-2" style="border-bottom:1px solid var(--card-border)">
+          <div>
+            <div style="font-weight:700">{{ result.game.title }}</div>
+            <small style="color:var(--text-muted)">{{ result.played_at|date:"d.m.Y H:i" }}</small>
+          </div>
+          <div class="text-end">
+            <div style="font-family:'Orbitron',sans-serif;font-weight:900;color:{% if result.percent >= 80 %}var(--accent){% elif result.percent >= 60 %}#ffc107{% else %}var(--secondary){% endif %}">
+              {{ result.percent }}%
+            </div>
+            <small style="color:var(--text-muted)">+{{ result.xp_earned }} XP</small>
+          </div>
+        </div>
+        {% empty %}
+        <p style="color:var(--text-muted)">Ты ещё не играл. <a href="{% url 'games:list' %}" style="color:var(--primary)">Начни прямо сейчас!</a></p>
+        {% endfor %}
+      </div>
+
+      <!-- Enrolled courses -->
+      <div class="card-game p-4">
+        <h5 style="font-weight:800;margin-bottom:1rem">📚 Мои курсы</h5>
+        {% for enrollment in enrollments %}
+        <div class="d-flex align-items-center justify-content-between py-2" style="border-bottom:1px solid var(--card-border)">
+          <div>
+            <div style="font-weight:700">{{ enrollment.course.title }}</div>
+            <small style="color:var(--text-muted)">{{ enrollment.course.get_category_display }}</small>
+          </div>
+          <div class="text-end">
+            {% if enrollment.completed %}
+            <span style="color:var(--accent);font-weight:700;font-size:.85rem">✓ Пройден</span>
+            {% else %}
+            <a href="{% url 'courses:detail' enrollment.course.pk %}" class="btn btn-outline-primary btn-sm">Продолжить</a>
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <p style="color:var(--text-muted)">Ты ещё не записался на курсы. <a href="{% url 'courses:list' %}" style="color:var(--primary)">Выбрать курс</a></p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

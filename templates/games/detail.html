@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}{{ game.title }} — Игровая Наука{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <img src="{{ game.cover_url }}" alt="{{ game.title }}" style="width:100%;border-radius:16px;object-fit:cover;max-height:350px;">
+      <div class="mt-4">
+        <div class="d-flex gap-2 mb-3">
+          <span class="badge-category">{{ game.get_category_display }}</span>
+          <span class="badge-diff-{{ game.difficulty }}">{{ game.get_difficulty_display }}</span>
+          <span style="color:var(--text-muted);font-size:.85rem"><i class="bi bi-people me-1"></i>{{ game.plays_count }} игр</span>
+        </div>
+        <h1 style="font-family:'Orbitron',sans-serif;font-weight:700;font-size:1.8rem">{{ game.title }}</h1>
+        <p style="color:var(--text-muted);font-size:1rem;line-height:1.7">{{ game.description }}</p>
+
+        <div class="card-game p-4 mt-4">
+          <h5 style="font-weight:800;margin-bottom:1rem">📊 Последние результаты</h5>
+          {% for result in recent_results %}
+          <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom:1px solid var(--card-border)">
+            <div class="d-flex align-items-center gap-2">
+              <img src="{{ result.user.avatar }}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">
+              <span style="font-weight:700">{{ result.user.username }}</span>
+            </div>
+            <div class="text-end">
+              <span style="color:var(--accent);font-weight:700">{{ result.percent }}%</span>
+              <small style="color:var(--text-muted);display:block">{{ result.played_at|timesince }} назад</small>
+            </div>
+          </div>
+          {% empty %}
+          <p style="color:var(--text-muted)">Будь первым, кто сыграет!</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card-game p-4" style="position:sticky;top:90px">
+        <h5 style="font-weight:800;margin-bottom:1.5rem">Детали игры</h5>
+        <div class="d-flex justify-content-between mb-2">
+          <span style="color:var(--text-muted)">Вопросов</span>
+          <span style="font-weight:700">{{ game.questions.count }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span style="color:var(--text-muted)">Время</span>
+          <span style="font-weight:700">~{{ game.play_time }} мин</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span style="color:var(--text-muted)">Сложность</span>
+          <span style="font-weight:700">{{ game.get_difficulty_display }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+          <span style="color:var(--text-muted)">Награда</span>
+          <span style="color:var(--accent);font-weight:800">+{{ game.xp_reward }} XP</span>
+        </div>
+
+        {% if best_result %}
+        <div style="background:rgba(67,233,123,0.1);border:1px solid rgba(67,233,123,0.3);border-radius:12px;padding:1rem;margin-bottom:1rem">
+          <div style="color:var(--accent);font-weight:700;margin-bottom:.25rem">🏆 Твой лучший результат</div>
+          <div style="font-size:1.5rem;font-weight:900;font-family:'Orbitron',sans-serif">{{ best_result.percent }}%</div>
+          <small style="color:var(--text-muted)">{{ best_result.correct_answers }}/{{ best_result.total_questions }} верных</small>
+        </div>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+        <a href="{% url 'games:play' game.pk %}" class="btn btn-primary w-100 btn-lg">
+          <i class="bi bi-play-fill me-2"></i>Начать игру
+        </a>
+        {% else %}
+        <a href="{% url 'accounts:login' %}?next={% url 'games:play' game.pk %}" class="btn btn-primary w-100 btn-lg">
+          <i class="bi bi-lock me-2"></i>Войти и играть
+        </a>
+        <p class="text-center mt-2 mb-0"><small style="color:var(--text-muted)">Нужен аккаунт для сохранения результатов</small></p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

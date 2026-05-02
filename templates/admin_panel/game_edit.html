@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}{% if game %}Редактировать{% else %}Добавить{% endif %} игру — Админ{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card-game p-4 p-md-5">
+        <h2 style="font-family:'Orbitron',sans-serif;font-weight:700;margin-bottom:2rem">
+          {% if game %}✏️ Редактировать игру{% else %}➕ Добавить игру{% endif %}
+        </h2>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-bold">Название</label>
+            <input type="text" name="title" class="form-control" value="{{ game.title|default:'' }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Описание</label>
+            <textarea name="description" class="form-control" rows="3" required>{{ game.description|default:'' }}</textarea>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Категория</label>
+              <select name="category" class="form-select" required>
+                {% for val, label in categories %}
+                <option value="{{ val }}" {% if game.category == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Сложность</label>
+              <select name="difficulty" class="form-select" required>
+                {% for val, label in difficulties %}
+                <option value="{{ val }}" {% if game.difficulty == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Тип игры</label>
+              <select name="game_type" class="form-select" required>
+                {% for val, label in types %}
+                <option value="{{ val }}" {% if game.game_type == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">URL обложки (Unsplash)</label>
+            <input type="url" name="cover_url" class="form-control" value="{{ game.cover_url|default:'' }}" placeholder="https://images.unsplash.com/..." required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Награда XP</label>
+            <input type="number" name="xp_reward" class="form-control" value="{{ game.xp_reward|default:50 }}" min="10" max="500">
+          </div>
+          {% if game %}
+          <div class="form-check mb-3">
+            <input type="checkbox" name="is_active" class="form-check-input" id="is_active" {% if game.is_active %}checked{% endif %}>
+            <label class="form-check-label" for="is_active" style="color:var(--text)">Игра активна</label>
+          </div>
+          {% endif %}
+          <div class="d-flex gap-3 mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-check me-1"></i>Сохранить
+            </button>
+            <a href="{% url 'admin_panel:games' %}" class="btn btn-outline-secondary px-4">Отмена</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация — Игровая Наука{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card-game p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div style="font-size:3rem">🚀</div>
+          <h2 style="font-family:'Orbitron',sans-serif;font-weight:700">Регистрация</h2>
+          <p style="color:var(--text-muted)">Начни учиться играя прямо сейчас!</p>
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-bold">Email</label>
+            {{ form.email }}
+            {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Имя пользователя</label>
+            {{ form.username }}
+            {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Я — </label>
+            {{ form.role }}
+            {% if form.role.errors %}<div class="text-danger small mt-1">{{ form.role.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Пароль</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-bold">Повторите пароль</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors.0 }}</div>{% endif %}
+          </div>
+          {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors.0 }}</div>
+          {% endif %}
+          <button type="submit" class="btn btn-primary w-100 btn-lg">
+            <i class="bi bi-rocket me-2"></i>Создать аккаунт
+          </button>
+        </form>
+        <p class="text-center mt-3 mb-0" style="color:var(--text-muted)">
+          Уже есть аккаунт? <a href="{% url 'accounts:login' %}" style="color:var(--primary);font-weight:700">Войти</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

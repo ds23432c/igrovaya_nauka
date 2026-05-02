@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% block title %}Игровая Наука — Учись играя!{% endblock %}
+{% block content %}
+
+<!-- Hero -->
+<section style="background: linear-gradient(135deg, #0D0D1A 0%, #1A1A2E 50%, #16213E 100%); padding: 5rem 0; position:relative; overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=1400&auto=format&fit=crop') center/cover no-repeat;opacity:0.06;"></div>
+  <div class="container position-relative">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <div class="badge mb-3 px-3 py-2" style="background:rgba(108,99,255,0.2);color:var(--primary);border:1px solid rgba(108,99,255,0.4);border-radius:20px;font-size:.85rem;font-weight:700;">
+          🚀 Геймификация образования
+        </div>
+        <h1 style="font-family:'Orbitron',sans-serif;font-weight:900;font-size:3rem;line-height:1.1;" class="mb-4">
+          Учись <span style="color:var(--primary)">играя</span>.<br>Играй <span style="color:var(--accent)">обучаясь</span>.
+        </h1>
+        <p class="lead mb-4" style="color:var(--text-muted);font-size:1.15rem;">
+          Образовательная платформа, где скучные уроки превращаются в захватывающие приключения. Зарабатывай XP, открывай достижения, соревнуйся с друзьями!
+        </p>
+        <div class="d-flex gap-3 flex-wrap">
+          {% if user.is_authenticated %}
+          <a href="{% url 'games:list' %}" class="btn btn-primary btn-lg px-4">
+            <i class="bi bi-controller me-2"></i>Играть сейчас
+          </a>
+          <a href="{% url 'courses:list' %}" class="btn btn-outline-primary btn-lg px-4">
+            <i class="bi bi-book me-2"></i>Курсы
+          </a>
+          {% else %}
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-4">
+            <i class="bi bi-rocket me-2"></i>Начать бесплатно
+          </a>
+          <a href="{% url 'games:list' %}" class="btn btn-outline-primary btn-lg px-4">
+            <i class="bi bi-eye me-2"></i>Посмотреть игры
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-lg-6 text-center mt-5 mt-lg-0">
+        <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:24px;padding:2rem;" class="float">
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="stat-card">
+                <div class="stat-number">{{ stat_users }}</div>
+                <div class="text-muted small">Учеников</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="stat-card">
+                <div class="stat-number">{{ stat_games }}</div>
+                <div class="text-muted small">Игр</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="stat-card">
+                <div class="stat-number">{{ stat_courses }}</div>
+                <div class="text-muted small">Курсов</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="stat-card">
+                <div class="stat-number">{{ stat_results }}</div>
+                <div class="text-muted small">Игр сыграно</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="section-title text-center mb-5">Почему <span style="color:var(--primary)">Игровая Наука</span>?</h2>
+    <div class="row g-4">
+      {% for icon, title, desc in '🎮,Игры и квизы,Сотни обучающих игр по всем предметам школьной программы|📈,Система XP и уровней,Зарабатывай опыт за каждое действие и прокачивай своего персонажа|🏆,Достижения,Открывай уникальные бейджи за особые успехи и рекорды|📚,Курсы,Структурированные уроки с теорией и практическими заданиями|🥇,Таблица лидеров,Соревнуйся с другими учениками и занимай топовые позиции|👨‍🏫,Для учителей,Создавайте свои квизы и отслеживайте прогресс учеников' | split:'|' %}
+      {% with item=forloop.counter %}
+      <div class="col-md-4">
+        <div class="card-game p-4 h-100">
+          <div style="font-size:2.5rem;margin-bottom:1rem">{{ icon }}</div>
+          <h5 style="font-weight:800">{{ title }}</h5>
+          <p style="color:var(--text-muted)">{{ desc }}</p>
+        </div>
+      </div>
+      {% endwith %}
+      {% endfor %}
+      <div class="col-md-4">
+        <div class="card-game p-4 h-100">
+          <div style="font-size:2.5rem;margin-bottom:1rem">🎮</div>
+          <h5 style="font-weight:800">Игры и квизы</h5>
+          <p style="color:var(--text-muted)">Сотни обучающих игр по всем предметам школьной программы</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-game p-4 h-100">
+          <div style="font-size:2.5rem;margin-bottom:1rem">📈</div>
+          <h5 style="font-weight:800">Система XP и уровней</h5>
+          <p style="color:var(--text-muted)">Зарабатывай опыт за каждое действие и прокачивай своего персонажа</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-game p-4 h-100">
+          <div style="font-size:2.5rem;margin-bottom:1rem">🏆</div>
+          <h5 style="font-weight:800">Достижения</h5>
+          <p style="color:var(--text-muted)">Открывай уникальные бейджи за особые успехи и рекорды</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-game p-4 h-100">
+          <div style="font-size:2.5rem;margin-bottom:1rem">📚</div>
+          <h5 style="font-weight:800">Курсы</h5>
+          <p style="color:var(--text-muted)">Структурированные уроки с теорией, примерами и практикой</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-game p-4 h-100">
+          <div style="font-size:2.5rem;margin-bottom:1rem">🥇</div>
+          <h5 style="font-weight:800">Таблица лидеров</h5>
+          <p style="color:var(--text-muted)">Соревнуйся с другими учениками и занимай топовые позиции</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Games -->
+<section class="py-5" style="background:rgba(255,255,255,0.02)">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="section-title mb-0">🎮 Популярные игры</h2>
+      <a href="{% url 'games:list' %}" class="btn btn-outline-primary btn-sm">Все игры →</a>
+    </div>
+    <div class="row g-4">
+      {% for game in featured_games %}
+      <div class="col-md-4">
+        <div class="card-game h-100">
+          <img src="{{ game.cover_url }}" alt="{{ game.title }}" style="width:100%;height:180px;object-fit:cover;">
+          <div class="p-3">
+            <div class="d-flex gap-2 mb-2">
+              <span class="badge-category">{{ game.get_category_display }}</span>
+              <span class="badge-diff-{{ game.difficulty }}">{{ game.get_difficulty_display }}</span>
+            </div>
+            <h6 style="font-weight:800;margin-bottom:.5rem">{{ game.title }}</h6>
+            <p style="color:var(--text-muted);font-size:.85rem;margin-bottom:1rem">{{ game.description|truncatechars:80 }}</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <span style="color:var(--accent);font-weight:700;font-size:.85rem">⭐ +{{ game.xp_reward }} XP</span>
+              <a href="{% url 'games:detail' game.pk %}" class="btn btn-primary btn-sm">Играть</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Courses -->
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="section-title mb-0">📚 Курсы</h2>
+      <a href="{% url 'courses:list' %}" class="btn btn-outline-primary btn-sm">Все курсы →</a>
+    </div>
+    <div class="row g-4">
+      {% for course in featured_courses %}
+      <div class="col-md-6">
+        <div class="card-game d-flex flex-row overflow-hidden" style="height:140px">
+          <img src="{{ course.cover_url }}" alt="{{ course.title }}" style="width:140px;object-fit:cover;flex-shrink:0">
+          <div class="p-3 d-flex flex-column justify-content-between flex-grow-1">
+            <div>
+              <span class="badge-category">{{ course.get_category_display }}</span>
+              <h6 style="font-weight:800;margin-top:.5rem;margin-bottom:.25rem">{{ course.title }}</h6>
+              <small style="color:var(--text-muted)">{{ course.lesson_count }} уроков · +{{ course.xp_reward }} XP</small>
+            </div>
+            <a href="{% url 'courses:detail' course.pk %}" class="btn btn-outline-primary btn-sm align-self-start">Начать →</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Top Players -->
+<section class="py-5" style="background:rgba(255,255,255,0.02)">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="section-title mb-0">🏆 Топ игроки</h2>
+      <a href="{% url 'leaderboard:list' %}" class="btn btn-outline-primary btn-sm">Весь рейтинг →</a>
+    </div>
+    <div class="row g-3">
+      {% for player in top_players %}
+      <div class="col-md-4 col-lg-2dot4">
+        <div class="card-game p-3 text-center">
+          <div style="position:relative;display:inline-block;margin-bottom:.75rem">
+            <img src="{{ player.avatar }}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--primary)">
+            <span style="position:absolute;bottom:-5px;right:-5px;background:var(--primary);border-radius:8px;padding:1px 6px;font-size:.65rem;font-weight:800;color:white">#{{ forloop.counter }}</span>
+          </div>
+          <div style="font-weight:800;font-size:.9rem">{{ player.username }}</div>
+          <div style="color:var(--accent);font-size:.8rem;font-weight:700">{{ player.xp }} XP</div>
+          <div style="color:var(--text-muted);font-size:.75rem">{{ player.get_level_title }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+{% if not user.is_authenticated %}
+<section class="py-5">
+  <div class="container">
+    <div class="card-game p-5 text-center glow">
+      <h2 class="section-title mb-3">Готов начать путешествие?</h2>
+      <p style="color:var(--text-muted);font-size:1.1rem;max-width:500px;margin:0 auto 2rem">Присоединяйся к тысячам учеников, которые уже учатся с удовольствием!</p>
+      <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-5">
+        <i class="bi bi-rocket me-2"></i>Зарегистрироваться бесплатно
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

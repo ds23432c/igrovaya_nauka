@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Игры — Игровая Наука{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h1 class="section-title mb-2">🎮 Все игры</h1>
+  <p style="color:var(--text-muted)" class="mb-4">Выбери игру и проверь свои знания!</p>
+
+  <!-- Filters -->
+  <div class="card-game p-3 mb-4">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small text-muted">Предмет</label>
+        <select name="category" class="form-select">
+          <option value="">Все предметы</option>
+          {% for val, label in categories %}
+          <option value="{{ val }}" {% if selected_category == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small text-muted">Сложность</label>
+        <select name="difficulty" class="form-select">
+          <option value="">Любая</option>
+          {% for val, label in difficulties %}
+          <option value="{{ val }}" {% if selected_difficulty == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i>Фильтр</button>
+      </div>
+      {% if selected_category or selected_difficulty %}
+      <div class="col-md-2">
+        <a href="{% url 'games:list' %}" class="btn btn-outline-secondary w-100">Сбросить</a>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+
+  <div class="row g-4">
+    {% for game in games %}
+    <div class="col-md-4">
+      <div class="card-game h-100">
+        <div style="position:relative">
+          <img src="{{ game.cover_url }}" alt="{{ game.title }}" style="width:100%;height:200px;object-fit:cover;">
+          <div style="position:absolute;top:12px;right:12px">
+            <span class="badge-diff-{{ game.difficulty }}">{{ game.get_difficulty_display }}</span>
+          </div>
+          <div style="position:absolute;bottom:12px;left:12px">
+            <span class="badge-category">{{ game.get_category_display }}</span>
+          </div>
+        </div>
+        <div class="p-4">
+          <h5 style="font-weight:800;margin-bottom:.5rem">{{ game.title }}</h5>
+          <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:1rem">{{ game.description|truncatechars:100 }}</p>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <span style="color:var(--accent);font-weight:700">⭐ +{{ game.xp_reward }} XP</span>
+              <span style="color:var(--text-muted);font-size:.8rem;margin-left:.75rem"><i class="bi bi-clock me-1"></i>{{ game.play_time }} мин</span>
+            </div>
+            <span style="color:var(--text-muted);font-size:.8rem"><i class="bi bi-people me-1"></i>{{ game.plays_count }}</span>
+          </div>
+          <a href="{% url 'games:detail' game.pk %}" class="btn btn-primary w-100">
+            <i class="bi bi-play-fill me-1"></i>Играть
+          </a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+      <div style="font-size:4rem">🎮</div>
+      <h4 style="color:var(--text-muted)">Игры не найдены</h4>
+      <a href="{% url 'games:list' %}" class="btn btn-primary mt-3">Показать все</a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
