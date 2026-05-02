@@ -1,1 +1,1 @@
-web: python manage.py migrate --fake-initial && python manage.py collectstatic --noinput && python manage.py init_data && python manage.py createsuperuser --noinput || true && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+web: python manage.py migrate --run-syncdb || python manage.py migrate --fake && python manage.py collectstatic --noinput && python manage.py init_data || true && python manage.py createsuperuser --noinput || true && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
