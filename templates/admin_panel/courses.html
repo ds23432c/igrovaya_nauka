@@ -18,7 +18,10 @@
       </div>
     </div>
     <div class="col-lg-9">
-      <h2 style="font-family:'Orbitron',sans-serif;font-weight:700;margin-bottom:1.5rem">📚 Курсы</h2>
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <h2 style="font-family:'Orbitron',sans-serif;font-weight:700;margin-bottom:0">📚 Курсы</h2>
+        <a href="{% url 'admin_panel:course_new' %}" class="btn btn-primary"><i class="bi bi-plus me-1"></i>Добавить курс</a>
+      </div>
       <div class="card-game overflow-hidden">
         <div class="table-responsive">
           <table class="table mb-0" style="color:var(--text)">
@@ -31,6 +34,7 @@
                 <th class="p-3">Записалось</th>
                 <th class="p-3">XP</th>
                 <th class="p-3">Статус</th>
+                <th class="p-3">Действия</th>
               </tr>
             </thead>
             <tbody>
@@ -53,6 +57,9 @@
                   {% else %}
                   <span style="color:var(--secondary);font-size:.8rem;font-weight:700">● Скрыт</span>
                   {% endif %}
+                </td>
+                <td class="p-3">
+                  <a href="{% url 'admin_panel:course_edit' course.pk %}" class="btn btn-sm btn-outline-primary">Изменить</a>
                 </td>
               </tr>
               {% endfor %}

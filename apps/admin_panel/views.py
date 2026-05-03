@@ -1,19 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
-from django.db.models import Count, Sum
+from django.db.models import Count
 from django.utils import timezone
 from datetime import timedelta
+
 from apps.accounts.models import User
-from apps.games.models import Game, Question, GameResult
-from apps.courses.models import Course, Lesson
+from apps.admin_panel.forms import AchievementForm, CourseForm
 from apps.achievements.models import Achievement
+from apps.courses.models import Course
+from apps.games.models import Game, GameResult
 
 
 def admin_required(view_func):
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated or not (request.user.is_staff or request.user.role == 'admin'):
-            from django.contrib.auth import logout
             return redirect('accounts:login')
         return view_func(request, *args, **kwargs)
     return wrapper
@@ -80,9 +80,12 @@ def game_edit(request, pk=None):
             messages.success(request, 'Игра обновлена!')
         else:
             game = Game.objects.create(
-                title=data['title'], description=data['description'],
-                category=data['category'], difficulty=data['difficulty'],
-                game_type=data['game_type'], cover_url=data['cover_url'],
+                title=data['title'],
+                description=data['description'],
+                category=data['category'],
+                difficulty=data['difficulty'],
+                game_type=data['game_type'],
+                cover_url=data['cover_url'],
                 xp_reward=int(data.get('xp_reward', 50)),
             )
             messages.success(request, 'Игра создана!')
@@ -102,6 +105,37 @@ def courses_list(request):
 
 
 @admin_required
+def course_edit(request, pk=None):
+    course = get_object_or_404(Course, pk=pk) if pk else None
+    form = CourseForm(request.POST or None, instance=course)
+    if request.method == 'POST' and form.is_valid():
+        course_obj = form.save(commit=False)
+        if course is None:
+            course_obj.author = request.user
+        course_obj.save()
+        messages.success(request, 'Курс обновлён!' if course else 'Курс создан!')
+        return redirect('admin_panel:courses')
+    return render(request, 'admin_panel/course_edit.html', {
+        'form': form,
+        'course': course,
+    })
+
+
+@admin_required
 def achievements_list(request):
     achievements = Achievement.objects.all().order_by('-id')
     return render(request, 'admin_panel/achievements.html', {'achievements': achievements})
+
+
+@admin_required
+def achievement_edit(request, pk=None):
+    achievement = get_object_or_404(Achievement, pk=pk) if pk else None
+    form = AchievementForm(request.POST or None, instance=achievement)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Достижение обновлено!' if achievement else 'Достижение создано!')
+        return redirect('admin_panel:achievements')
+    return render(request, 'admin_panel/achievement_edit.html', {
+        'form': form,
+        'achievement': achievement,
+    })

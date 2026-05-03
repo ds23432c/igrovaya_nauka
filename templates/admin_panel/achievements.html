@@ -18,7 +18,10 @@
       </div>
     </div>
     <div class="col-lg-9">
-      <h2 style="font-family:'Orbitron',sans-serif;font-weight:700;margin-bottom:1.5rem">🏆 Достижения</h2>
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <h2 style="font-family:'Orbitron',sans-serif;font-weight:700;margin-bottom:0">🏆 Достижения</h2>
+        <a href="{% url 'admin_panel:achievement_new' %}" class="btn btn-primary"><i class="bi bi-plus me-1"></i>Добавить достижение</a>
+      </div>
       <div class="row g-3">
         {% for ach in achievements %}
         <div class="col-md-6">
@@ -34,6 +37,9 @@
             <div style="text-align:right">
               <div style="color:var(--accent);font-weight:700">+{{ ach.xp_reward }} XP</div>
               <div style="color:var(--text-muted);font-size:.75rem">{{ ach.get_category_display }}</div>
+              <div class="mt-2">
+                <a href="{% url 'admin_panel:achievement_edit' ach.pk %}" class="btn btn-sm btn-outline-primary">Изменить</a>
+              </div>
             </div>
           </div>
         </div>
